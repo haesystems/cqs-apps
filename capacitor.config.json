@@ -1,0 +1,33 @@
+{
+  "appId": "net.haesystems.codigocqs",
+  "appName": "Código CQS",
+  "webDir": "www",
+  "appendUserAgent": "CQSApp/codigocqs",
+  "backgroundColor": "#0C1F48",
+  "server": {
+    "url": "https://clubdeconquistadores.com/codigocqs",
+    "errorPath": "offline.html",
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#4D12A2",
+      "showSpinner": false
+    },
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover",
+      "style": "DARK"
+    }
+  }
+}

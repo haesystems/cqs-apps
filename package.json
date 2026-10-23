@@ -1,0 +1,23 @@
+{
+  "name": "codigocqs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Código CQS — app del Club de Conquistadores (HAE SYSTEMS)",
+  "scripts": {
+    "preparar:android": "node ../../scripts/preparar-android.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3"
+  },
+  "cqs": {
+    "colorBarras": "#0C1F48"
+  }
+}
