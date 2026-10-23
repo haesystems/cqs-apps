@@ -3,7 +3,7 @@
   "appName": "Código CQS",
   "webDir": "www",
   "appendUserAgent": "CQSApp/codigocqs",
-  "backgroundColor": "#4D12A2",
+  "backgroundColor": "#0C1F48",
   "server": {
     "url": "https://clubdeconquistadores.com/codigocqs",
     "errorPath": "offline.html",
