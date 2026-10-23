@@ -16,5 +16,8 @@
   "devDependencies": {
     "@capacitor/assets": "3.0.5",
     "@capacitor/cli": "8.5.3"
+  },
+  "cqs": {
+    "colorBarras": "#2B160B"
   }
 }
