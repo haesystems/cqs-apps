@@ -1,0 +1,8 @@
+node_modules/
+apps/*/android/
+apps/*/ios/
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+.DS_Store

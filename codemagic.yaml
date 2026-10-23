@@ -1,0 +1,44 @@
+# Apps del Club de Conquistadores — HAE SYSTEMS
+# Etapa 1: APK de prueba (debug) para instalar directo en un celular Android.
+# Las versiones para Google Play (AAB firmado) y App Store (iOS) se agregan en las siguientes etapas.
+
+definitions:
+  entorno: &entorno
+    node: 22
+    java: 21
+  pasos_android: &pasos_android
+    - name: Instalar dependencias
+      script: npm ci
+    - name: Crear proyecto Android
+      script: npx cap add android
+    - name: Íconos y pantalla de inicio
+      script: npx capacitor-assets generate --android
+    - name: Sincronizar Capacitor
+      script: npx cap sync android
+    - name: Versión y SDK
+      script: npm run preparar:android
+    - name: Compilar APK de prueba
+      script: cd android && ./gradlew assembleDebug
+
+workflows:
+  codigocqs-android-prueba:
+    name: Código CQS · Android (APK de prueba)
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    working_directory: apps/codigocqs
+    environment: *entorno
+    scripts: *pasos_android
+    artifacts:
+      - apps/codigocqs/android/app/build/outputs/apk/debug/*.apk
+      - android/app/build/outputs/apk/debug/*.apk
+
+  clubcqs-android-prueba:
+    name: Reto RPSP · Android (APK de prueba)
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    working_directory: apps/clubcqs
+    environment: *entorno
+    scripts: *pasos_android
+    artifacts:
+      - apps/clubcqs/android/app/build/outputs/apk/debug/*.apk
+      - android/app/build/outputs/apk/debug/*.apk

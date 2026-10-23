@@ -1,0 +1,16 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Reto RPSP</title>
+<style>html,body{margin:0;height:100%}body{background:#2B160B;color:#F1E4CF;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box}
+main{max-width:340px}h1{font-size:24px;margin:0 0 10px}p{font-size:16px;line-height:1.5;opacity:.9;margin:0 0 22px}
+button{border:0;border-radius:10px;background:#F2B705;color:#1b1b1b;font-weight:800;font-size:17px;padding:14px 26px}</style></head>
+<body><main>
+<div style="font-size:54px">📶</div>
+<h1 id="t">Sin conexión</h1>
+<p id="d">Para jugar necesitas internet. Revisa tu conexión y vuelve a intentar.</p>
+<button id="b" onclick="location.replace('https://clubdeconquistadores.com/rpsp')">Reintentar</button>
+</main>
+<script>
+var l=(navigator.language||'es').slice(0,2),T={en:['No connection','You need internet to play. Check your connection and try again.','Try again'],pt:['Sem conexão','Você precisa de internet para jogar. Verifique sua conexão e tente novamente.','Tentar de novo']};
+if(T[l]){t.textContent=T[l][0];d.textContent=T[l][1];b.textContent=T[l][2];}
+window.addEventListener('online',function(){location.replace('https://clubdeconquistadores.com/rpsp');});
+</script></body></html>
