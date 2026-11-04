@@ -10,6 +10,29 @@ const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 const gradle = 'android/app/build.gradle';
 if (!fs.existsSync(gradle)) { console.error('No existe ' + gradle + ' (falta "npx cap add android")'); process.exit(1); }
 
+// 0) Firma de la versión para Google Play: usa el keystore que Codemagic carga (android_signing).
+//    Sin esas variables (APK de prueba) no cambia nada.
+if (process.env.CM_KEYSTORE_PATH && !fs.readFileSync(gradle, 'utf8').includes('signingConfigs')) {
+  let gx = fs.readFileSync(gradle, 'utf8');
+  const firma = [
+    '    signingConfigs {',
+    '        release {',
+    '            storeFile file(System.getenv("CM_KEYSTORE_PATH"))',
+    '            storePassword System.getenv("CM_KEYSTORE_PASSWORD")',
+    '            keyAlias System.getenv("CM_KEY_ALIAS")',
+    '            keyPassword System.getenv("CM_KEY_PASSWORD")',
+    '        }',
+    '    }',
+    '    buildTypes {',
+  ].join('\n');
+  const antes = gx;
+  gx = gx.replace(/\n    buildTypes \{/, '\n' + firma);
+  gx = gx.replace(/(release \{\n\s*minifyEnabled false)/, 'release {\n            signingConfig signingConfigs.release\n            minifyEnabled false');
+  if (gx === antes) { console.error('No pude agregar la firma a build.gradle'); process.exit(1); }
+  fs.writeFileSync(gradle, gx);
+  console.log('Firma de Google Play configurada (alias ' + process.env.CM_KEY_ALIAS + ')');
+}
+
 // 1) Versión
 const code = parseInt(process.env.BUILD_NUMBER || '1', 10) + 100;  // +100: margen por si alguna vez se sube una versión manual
 let g = fs.readFileSync(gradle, 'utf8');
