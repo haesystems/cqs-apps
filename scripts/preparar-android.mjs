@@ -37,8 +37,48 @@ if (!st.includes('cqs_fondo')) {
   fs.writeFileSync(stylesPath, st);
 }
 
+// 2b) Pantalla de inicio (Android 12+ usa la pantalla del sistema: sin esto sale blanca)
+const splash = (pkg.cqs && pkg.cqs.colorSplash) || color;
+fs.writeFileSync(res + '/cqs_colores.xml',
+  '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="cqs_fondo">' + color + '</color>\n    <color name="cqs_splash">' + splash + '</color>\n</resources>\n');
+st = fs.readFileSync(stylesPath, 'utf8');
+if (!st.includes('cqs_splash')) {
+  const antes = st;
+  st = st.replace(/(<style name="AppTheme\.NoActionBarLaunch"[^>]*>)/, '$1\n' + [
+    '        <item name="windowSplashScreenBackground">@color/cqs_splash</item>',
+    '        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>',
+    '        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>',
+    '        <item name="android:windowBackground">@color/cqs_splash</item>',
+  ].join('\n'));
+  if (st === antes) { console.error('No encontré el estilo AppTheme.NoActionBarLaunch en styles.xml'); process.exit(1); }
+  fs.writeFileSync(stylesPath, st);
+}
+
+// 2c) Enlaces del sitio (QR de la partida): abren la app si está instalada (App Links).
+//     La verificación automática necesita /.well-known/assetlinks.json con la huella del certificado de firma.
+const ruta = pkg.cqs && pkg.cqs.enlaces;
+const man = 'android/app/src/main/AndroidManifest.xml';
+if (ruta) {
+  let mx = fs.readFileSync(man, 'utf8');
+  if (!mx.includes('clubdeconquistadores.com')) {
+    const filtro = [
+      '            <intent-filter android:autoVerify="true">',
+      '                <action android:name="android.intent.action.VIEW" />',
+      '                <category android:name="android.intent.category.DEFAULT" />',
+      '                <category android:name="android.intent.category.BROWSABLE" />',
+      '                <data android:scheme="https" android:host="clubdeconquistadores.com" android:pathPrefix="' + ruta + '" />',
+      '            </intent-filter>',
+      '',
+    ].join('\n');
+    const antes = mx;
+    mx = mx.replace(/(\n\s*<\/activity>)/, '\n' + filtro + '$1');
+    if (mx === antes) { console.error('No encontré </activity> en AndroidManifest.xml'); process.exit(1); }
+    fs.writeFileSync(man, mx);
+  }
+}
+
 // 3) SDK
 const sdk = process.env.ANDROID_SDK_ROOT || process.env.ANDROID_HOME;
 if (sdk) fs.writeFileSync('android/local.properties', 'sdk.dir=' + sdk + '\n');
 
-console.log(`Android listo: versionName ${pkg.version} · versionCode ${code} · barras ${color} · SDK ${sdk || '(no definido)'}`);
+console.log(`Android listo: versionName ${pkg.version} · versionCode ${code} · barras ${color} · inicio ${splash} · enlaces ${ruta || '-'} · SDK ${sdk || '(no definido)'}`);
