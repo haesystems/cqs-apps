@@ -1,24 +1,48 @@
 # Apps del Club de Conquistadores — HAE SYSTEMS
-# Etapa 1: APK de prueba (debug) para instalar directo en un celular Android.
-# Las versiones para Google Play (AAB firmado) y App Store (iOS) se agregan en las siguientes etapas.
+# - «APK de prueba»: debug, para instalar directo en un celular.
+# - «Google Play»: AAB firmado (para subir a Play Console) + APK firmado; usa el keystore «haesystems_upload»
+#   cargado en Codemagic (Settings → Code signing identities → Android keystores).
 
 definitions:
   entorno: &entorno
     node: 22
     java: 21
+  entorno_play: &entorno_play
+    node: 22
+    java: 21
+    android_signing:
+      - haesystems_upload
+  paso_npm: &paso_npm
+    name: Instalar dependencias
+    script: npm ci
+  paso_android: &paso_android
+    name: Crear proyecto Android
+    script: npx cap add android
+  paso_iconos: &paso_iconos
+    name: Íconos y pantalla de inicio
+    script: npx capacitor-assets generate --android
+  paso_sync: &paso_sync
+    name: Sincronizar Capacitor
+    script: npx cap sync android
+  paso_prep: &paso_prep
+    name: Versión, firma y SDK
+    script: npm run preparar:android
   pasos_android: &pasos_android
-    - name: Instalar dependencias
-      script: npm ci
-    - name: Crear proyecto Android
-      script: npx cap add android
-    - name: Íconos y pantalla de inicio
-      script: npx capacitor-assets generate --android
-    - name: Sincronizar Capacitor
-      script: npx cap sync android
-    - name: Versión y SDK
-      script: npm run preparar:android
+    - *paso_npm
+    - *paso_android
+    - *paso_iconos
+    - *paso_sync
+    - *paso_prep
     - name: Compilar APK de prueba
       script: cd android && ./gradlew assembleDebug
+  pasos_play: &pasos_play
+    - *paso_npm
+    - *paso_android
+    - *paso_iconos
+    - *paso_sync
+    - *paso_prep
+    - name: Compilar AAB y APK firmados
+      script: cd android && ./gradlew bundleRelease assembleRelease
 
 workflows:
   codigocqs-android-prueba:
@@ -42,3 +66,29 @@ workflows:
     artifacts:
       - apps/clubcqs/android/app/build/outputs/apk/debug/*.apk
       - android/app/build/outputs/apk/debug/*.apk
+
+  codigocqs-android-play:
+    name: Código CQS · Android (Google Play)
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    working_directory: apps/codigocqs
+    environment: *entorno_play
+    scripts: *pasos_play
+    artifacts:
+      - apps/codigocqs/android/app/build/outputs/bundle/release/*.aab
+      - apps/codigocqs/android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/bundle/release/*.aab
+      - android/app/build/outputs/apk/release/*.apk
+
+  clubcqs-android-play:
+    name: Reto RPSP · Android (Google Play)
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    working_directory: apps/clubcqs
+    environment: *entorno_play
+    scripts: *pasos_play
+    artifacts:
+      - apps/clubcqs/android/app/build/outputs/bundle/release/*.aab
+      - apps/clubcqs/android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/bundle/release/*.aab
+      - android/app/build/outputs/apk/release/*.apk
